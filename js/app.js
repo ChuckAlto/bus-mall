@@ -6,18 +6,20 @@ const allPics = [];
 
 let CLICKS_ALLOWED = 25;
 let votes = 0;
+let indexCollection = [];
+
 let myContainer = document.getElementById('container');
 
 let imageOne = document.getElementById('image-one');
 let imageTwo = document.getElementById('image-two');
 let imageThree = document.getElementById('image-three');
 
-let viewResults = document.getElementById('view-results');
 
 
-function Bus (name, fileExtension = 'jpg'){
+
+function Bus(name, fileExtension = 'jpg') {
   this.name = name;
-  this.src= `img/${name}.${fileExtension}`;
+  this.src = `img/${name}.${fileExtension}`;
   this.views = 0;
   this.votes = 0;
   allPics.push(this);
@@ -44,22 +46,34 @@ new Bus('water-can');
 new Bus('wine-glass');
 
 
-function getRandomPic (){
+function getRandomPic() {
   return Math.floor(Math.random() * allPics.length);
 }
 
 
 
-function renderPics(){
 
-  let busOne=getRandomPic();
-  let busTwo=getRandomPic();
-  let busThree=getRandomPic();
+function renderPics() {
 
-  while(busOne === busTwo || busOne === busThree || busTwo === busThree){
-    busTwo = getRandomPic();
-    busThree = getRandomPic();
+
+
+
+  while (indexCollection.length < 6) {
+    let randomNum = getRandomPic();
+    while (!indexCollection.includes(randomNum)) {
+      indexCollection.push(randomNum);
+    }
+
   }
+  console.log(indexCollection);
+
+
+  let busOne = indexCollection.shift();
+  let busTwo = indexCollection.shift();
+  let busThree = indexCollection.shift();
+  console.log(busOne, busTwo, busThree);
+  console.log(indexCollection);
+
   imageOne.src = allPics[busOne].src;
   imageOne.alt = allPics[busOne].name;
   allPics[busOne].views++;
@@ -71,42 +85,89 @@ function renderPics(){
   imageThree.src = allPics[busThree].src;
   imageThree.alt = allPics[busThree].name;
   allPics[busThree].views++;
+
+
 }
 
-function handleImageClick(event){
+function renderBusChart() {
+  const chart = document.getElementById('my-chart').getContext('2d');
+
+  let busNames = [];
+  let busVotes = [];
+  let busViews = [];
+
+
+  for (let i = 0; i < allPics.length; i++) {
+    busNames.push(allPics[i].name);
+    busVotes.push(allPics[i].votes);
+    busViews.push(allPics[i].views);
+  }
+
+
+  let chartData = {
+    type: 'bar',
+    color: 'rgba(0, 0, 0, 1)',
+    data: {
+      labels: busNames,
+      datasets: [{
+        label: 'number of votes',
+        data: busVotes,
+        backgroundColor: 'rgba(172, 12, 85, .5)',
+        borderColor: 'rgba(0, 0, 0, 1)',
+        borderWidth: 1
+      },
+
+      {
+        label: 'number of views',
+        data: busViews,
+        backgroundColor: 'rgba(24, 200, 1, .5)',
+        borderColor: 'rgba(0, 0, 0, 1)',
+        borderWidth: 1
+      }]
+    },
+
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+
+
+  };
+
+  let myChart = new Chart(chart, chartData);
+}
+
+function showSection(){
+  document.getElementById('sectionId').style.display='block';
+}
+
+
+function handleImageClick(event) {
   votes++;
   let imageClicked = event.target.alt;
   console.log(imageClicked);
 
-  for (let i = 0; i < allPics.length; i++){
-    if(imageClicked === allPics[i].name){
+  for (let i = 0; i < allPics.length; i++) {
+    if (imageClicked === allPics[i].name) {
       allPics[i].votes++;
     }
   }
   renderPics();
 
-  if (votes === CLICKS_ALLOWED){
+
+  if (votes === CLICKS_ALLOWED) {
     myContainer.removeEventListener('click', handleImageClick);
+    showSection();
+    renderBusChart();
+
   }
-}
-
-function handleShowResults(event){
-  let results = document.getElementById('results');
-  if(votes === CLICKS_ALLOWED){
-
-    for (let i =0; i < allPics.length; i++){
-
-      let li = document.createElement('li');
-      li.textContent = `${allPics[i].name} was viewed ${allPics[i].views} times and clicked ${allPics[i].votes} times`;
-      results.appendChild(li);
-    }
-  }
-  else alert(`Must vote ${CLICKS_ALLOWED} times before viewing results.`);
-
 }
 
 renderPics();
 
 myContainer.addEventListener('click', handleImageClick);
 
-viewResults.addEventListener('click', handleShowResults);
+
