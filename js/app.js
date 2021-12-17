@@ -26,7 +26,7 @@ function Bus(name, fileExtension = 'jpg') {
 }
 
 let retreivedbus = localStorage.getItem('bus');
-// console.log(retreivedbus);
+
 
 if(retreivedbus){
   let parsedBus = JSON.parse(retreivedbus);
@@ -76,14 +76,13 @@ function renderPics() {
     }
 
   }
-  // console.log(indexCollection);
+
 
 
   let busOne = indexCollection.shift();
   let busTwo = indexCollection.shift();
   let busThree = indexCollection.shift();
-  // console.log(busOne, busTwo, busThree);
-  // console.log(indexCollection);
+
 
   imageOne.src = allPics[busOne].src;
   imageOne.alt = allPics[busOne].name;
@@ -159,7 +158,7 @@ function showSection(){
 function handleImageClick(event) {
   votes++;
   let imageClicked = event.target.alt;
-  // console.log(imageClicked);
+
 
   for (let i = 0; i < allPics.length; i++) {
     if (imageClicked === allPics[i].name) {
@@ -176,7 +175,7 @@ function handleImageClick(event) {
 
 
     let stringifiedBus = JSON.stringify(allPics);
-    // console.log(stringifiedBus);
+
 
     localStorage.setItem('bus', stringifiedBus);
   }
